@@ -47,9 +47,11 @@ def main(verbosity=False):
     st.write(df_pred)
 
     err_list = []
+    total_error = 0
     for i in range(df_pred.shape[0]):
         err_ = (df_pred['y'].iloc[i] - df_pred['y_pred'].iloc[i]) ** 2
         err_list.append(err_)
+        total_error += err_
     temp = pd.DataFrame(dict(err=err_list, y_pred=df_pred['y_pred']))
 
     fig = px.scatter(temp, x="y_pred", y="err", trendline="ols", title="Loss Function vs. Prediction")
@@ -57,7 +59,7 @@ def main(verbosity=False):
     mse = mean_squared_error(df_pred.y, df_pred.y_pred)
     mse = round(mse, 3)
     st.write("Mean Squared Error of General Model's predictions = " + str(mse))
-
+    st.write("Total error = " + str(total_error))
     st.line_chart(df_pred[-300:])
 
     ################################################## NEW MODEL ####################
@@ -93,31 +95,33 @@ def main(verbosity=False):
     ############## NEW MODEL PREDICTION #####################
 
     st.subheader("New Model Prediction on Test Data")
-    beta = reg2(X_train, y_train, verbose=verbosity)
-    st.latex(fr"Price = {beta[1]:.4f} \times MedInc + {beta[0]:.4f}")
+    beta2 = reg2(X_train, y_train, verbose=verbosity)
+    st.latex(fr"Price = {beta2[1]:.4f} \times MedInc + {beta2[0]:.4f}")
 
     pred_list = []
     for i in X_test:
-        y_pred = i * beta[1] + beta[0]
+        y_pred = i * beta2[1] + beta2[0]
         pred_list.append(y_pred)
-    df_pred = pd.DataFrame(dict(y=y_test, y_pred=pred_list))
-    st.write(df_pred)
+    df_pred2 = pd.DataFrame(dict(y=y_test, y_pred=pred_list))
+    st.write(df_pred2)
 
     err_list = []
-    for i in range(df_pred.shape[0]):
-        err_ = 1 - math.exp((-(df_pred['y'].iloc[i] - df_pred['y_pred'].iloc[i]) ** 2) / 2)
+    total_error = 0
+    for i in range(df_pred2.shape[0]):
+        err_ = 1 - math.exp((-(df_pred2['y'].iloc[i] - df_pred2['y_pred'].iloc[i]) ** 2) / 2)
         err_list.append(err_)
-    temp = pd.DataFrame(dict(err=err_list, y_pred=df_pred['y_pred']))
+        total_error += err_
+    temp2 = pd.DataFrame(dict(err=err_list, y_pred=df_pred2['y_pred']))
 
-    fig = px.scatter(temp, x="y_pred", y="err", trendline="ols", title="Loss Function vs. Prediction")
+    fig = px.scatter(temp2, x="y_pred", y="err", trendline="ols", title="Loss Function vs. Prediction")
     st.plotly_chart(fig, use_container_width=True)
-    mse = mean_squared_error(df_pred.y, df_pred.y_pred)
-    mse = round(mse, 3)
-    st.write("Mean Squared Error of New Model's predictions = " + str(mse))
-
+    mse2 = mean_squared_error(df_pred2.y, df_pred2.y_pred)
+    mse2 = round(mse2, 3)
+    st.write("Mean Squared Error of New Model's predictions = " + str(mse2))
+    st.write("Total error = "+str(total_error))
     st.write("We can see that the new loss function is convex for beta values.")
 
-    st.line_chart(df_pred[-300:])
+    st.line_chart(df_pred2[-300:])
 
 
 ######################################################################
