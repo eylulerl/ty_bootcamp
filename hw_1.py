@@ -118,7 +118,18 @@ def main(verbosity=False):
     mse2 = mean_squared_error(df_pred2.y, df_pred2.y_pred)
     mse2 = round(mse2, 3)
     st.write("Mean Squared Error of New Model's predictions = " + str(mse2))
-    st.write("Total error = "+str(total_error))
+
+    ### if we calculate total error according to the previous loss function:
+    err_list2 = []
+    total_error = 0
+    for i in range(df_pred2.shape[0]):
+        err = (df_pred2['y'].iloc[i] - df_pred2['y_pred'].iloc[i]) ** 2
+        err_list2.append(err)
+        total_error += err
+    
+    st.write("Total (mean squared) error = "+str(total_error))
+
+
     st.write("We can see that the new loss function is convex for beta values.")
 
     st.line_chart(df_pred2[-300:])
